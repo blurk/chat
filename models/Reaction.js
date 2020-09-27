@@ -1,42 +1,43 @@
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-	class Message extends Model {
+	class Reaction extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
 		 * The `models/index` file will call this method automatically.
 		 */
-		static associate({ Reaction }) {
+		static associate({ User, Message }) {
 			// define association here
-			this.hasMany(Reaction, { as: 'reactions' });
+			//*one to many: One User has many reactions but many reactions belong to one user
+			this.belongsTo(Message, { foreignKey: 'messageId' });
+			this.belongsTo(User, { foreignKey: 'userId' });
 		}
 	}
-	Message.init(
+	Reaction.init(
 		{
 			content: {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			uuid: {
-				type: DataTypes.STRING,
+				type: DataTypes.UUID,
 				defaultValue: DataTypes.UUIDV4,
+			},
+			messageId: {
+				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
-			from: {
-				type: DataTypes.STRING,
+			userId: {
+				type: DataTypes.INTEGER,
 				allowNull: false,
-			},
-			to: {
-				type: DataTypes.STRING,
-				allowNull: false,
-				tableName: 'message',
 			},
 		},
 		{
 			sequelize,
-			modelName: 'Message',
+			modelName: 'Reaction',
+			tableName: 'reactions',
 		}
 	);
-	return Message;
+	return Reaction;
 };
